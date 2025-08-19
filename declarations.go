@@ -8,7 +8,12 @@ type Host struct {
 	mu        sync.RWMutex
 }
 
-type Config struct {
+type Pool struct {
 	Hosts []*Host `json:"hosts"`
-	HealthCheckInterval int `json:"healthcheck_interval"`
+}
+
+type Config struct {
+	Pool                []*Pool `json:"pools"`
+	HealthCheckInterval int     `json:"healthcheck_interval"`
+	IsMultiplePool bool `json:"is_multiple_pool"`
 }

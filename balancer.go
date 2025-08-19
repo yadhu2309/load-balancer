@@ -65,12 +65,12 @@ func HealthCheck(servers []*Host) {
 func HandleConnection(client net.Conn, servers []*Host) {
 	log.Println("in handle connection")
 	defer client.Close()
-	server := NextServer(servers).Address
-	if server == "" {
+	server := NextServer(servers)
+	if server == nil {
 		log.Println("No Healthy server")
 		return
 	}
-	serverDial, err := net.Dial("tcp", server)
+	serverDial, err := net.Dial("tcp", server.Address)
 	log.Println("goroutine handle", serverDial.RemoteAddr())
 	if err != nil {
 		// panic(err)
@@ -78,8 +78,11 @@ func HandleConnection(client net.Conn, servers []*Host) {
 		return
 	}
 	defer serverDial.Close()
-	go func() {
+	var wg sync.WaitGroup
+	wg.Add(2)
 
+	go func() {
+		defer wg.Done()
 		_, err := io.Copy(serverDial, client)
 		if err != nil {
 			if strings.Contains(err.Error(), "broken pipe") ||
@@ -89,6 +92,14 @@ func HandleConnection(client net.Conn, servers []*Host) {
 			}
 			log.Println("❌ Copy error:", err)
 		}
+
 	}()
-	io.Copy(client, serverDial)
+	go func() {
+		defer wg.Done()
+		io.Copy(client, serverDial)
+	}()
+
+	wg.Wait()
+	log.Println("✅ connection closed cleanly")
+
 }

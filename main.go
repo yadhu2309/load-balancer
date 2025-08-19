@@ -116,14 +116,26 @@ func main() {
 	// 	log.SetOutput(file)
 	// }
 	config := ConfigLoader()
-	servers := config.Hosts
+	pools := config.Pool
+
 	interval := config.HealthCheckInterval
+	isMultiplePool := config.IsMultiplePool
 
 	ticker := time.NewTicker(time.Duration(interval) * time.Second)
 	go func() {
 		for range ticker.C {
+			if isMultiplePool {
+
+				for _, pool := range pools {
+					servers := pool.Hosts
+					HealthCheck(servers)
+				}
+			} else {
+				log.Println("IsmultiplePool", false)
+				servers := pools[0].Hosts
+				HealthCheck(servers)
+			}
 			// fmt.Println("running", ticker)
-			HealthCheck(servers)
 		}
 	}()
 
@@ -135,12 +147,19 @@ func main() {
 	defer listener.Close()
 	for {
 		conn, err := listener.Accept()
-		log.Println("entered", conn.LocalAddr().Network())
 		if err != nil {
 			log.Println("error occured ", err)
 			continue
 		}
-		go HandleConnection(conn, servers)
+		log.Println("entered", conn.LocalAddr().Network())
+		go func(conn net.Conn) {
+
+			// for _, pool := range pools {
+			servers := pools[0].Hosts
+			HandleConnection(conn, servers)
+			// }
+		}(conn)
+
 	}
 
 }
