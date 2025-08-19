@@ -1,0 +1,13 @@
+{
+    "hosts": [
+        {
+            "address": "localhost:8001",
+            "is_healthy": true
+        },
+        {
+            "address": "localhost:8002",
+            "is_healthy": true
+        }
+    ],
+    "healthcheck_interval": 10 
+}
