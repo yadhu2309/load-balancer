@@ -10,7 +10,7 @@ import (
 
 // var Name = "yadhu"
 
-func ConfigLoader() *Config{
+func ConfigLoader() *map[string]*PoolConfig {
 	file, err := os.Open("config.json")
 	if err != nil {
 		log.Println("❌Error in file opening", err)
@@ -21,7 +21,7 @@ func ConfigLoader() *Config{
 	if err != nil {
 		log.Println("Error in file reading", err)
 	}
-	var cfg Config
+	var cfg map[string]*PoolConfig
 	if err := json.Unmarshal(jsonData, &cfg); err != nil {
 		log.Fatalf("Failed to parse config: %v", err)
 	}
