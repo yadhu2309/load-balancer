@@ -21,10 +21,7 @@ var Sema = InitSemaphore(runtime.NumCPU() * 4)
 
 func main() {
 	log.Println("Load balancer!!!!!!!!!!!!!!!!!")
-	// file, err := AppLog()
-	// if err == nil {
-	// 	log.SetOutput(file)
-	// }
+	
 	config := ConfigLoader()
 	if config == nil {
 		log.Println("Config.json is empty or not found")
@@ -51,7 +48,9 @@ func main() {
 			HealthCheck(servers)
 		}
 	}()
-	TCPLoadBalancer(*pools, tcpConfig.RateLimit)
+	loadingStrategy := tcpConfig.LoadingStrategy
+	log.Println("Loading Strategy:", loadingStrategy)
+	TCPLoadBalancer(*pools, tcpConfig.RateLimit, loadingStrategy)
 	// ratelimiter := GetClientBucket("127.0.0.1")
 	// if !ratelimiter.Allow() {
 	// 	fmt.Println("ratelimiter.........")

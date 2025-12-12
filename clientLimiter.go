@@ -2,7 +2,7 @@ package main
 
 import (
 	// "fmt"
-	"fmt"
+	// "fmt"
 	"log"
 	"time"
 )
@@ -14,7 +14,9 @@ func ClientLimiter(capacity int, refillRatePerSec int) *TokenBucket {
 		// 	d := time.Second / time.Duration(refillRatePerSec)
 		// 	return &d
 		// }(),
-		RefillRatePerSec: time.Second / time.Duration(refillRatePerSec),
+		RefillRatePerSec: time.Duration(time.Second.Nanoseconds() / int64(refillRatePerSec)),
+
+		// RefillRatePerSec: time.Second / time.Duration(refillRatePerSec),
 	}
 
 	go tb.RefillToken()
@@ -27,11 +29,13 @@ func (tb *TokenBucket) RefillToken() {
 	ticker := time.NewTicker(tb.RefillRatePerSec)
 
 	for range ticker.C {
-		fmt.Print("yadhu")
+		// fmt.Print("yadhu")
 		tb.mu.Lock()
 		if tb.Token < tb.Capacity {
 			log.Println("Refilling Token in every", tb.RefillRatePerSec)
 			tb.Token++
+		}else {
+			log.Println("bucket is full", tb.Token)
 		}
 		tb.mu.Unlock()
 	}

@@ -2,4 +2,4 @@
 2. Auto tune (Semaphore size, resizing Semaphore) as per cpu usage
 3. url match
 
-curl --http1.0 localhost:8000
+curl --http1.0 localhost:8000/hms/category

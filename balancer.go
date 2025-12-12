@@ -13,6 +13,26 @@ import (
 var current int
 var mu sync.Mutex
 
+func LeastConnections(servers []*Host) *Host {
+
+		var selectedServer *Host
+		minConnections := int(^uint(0) >> 1) // Max int value
+		for _, server := range servers {
+			server.mu.RLock()
+			isHealthy := server.IsHealthy
+			activeCon := server.ActiveCon
+			server.mu.RUnlock()	
+			if isHealthy != nil && *isHealthy {
+				if activeCon < minConnections {
+					minConnections = activeCon
+					selectedServer = server
+				}
+		}
+		}	
+		return selectedServer	
+	}
+
+// Round Robin Strategy
 func NextServer(servers []*Host) *Host {
 	mu.Lock()
 	defer mu.Unlock()
@@ -62,14 +82,22 @@ func HealthCheck(servers []*Host) {
 	// }
 }
 
-func HandleConnection(client net.Conn, servers []*Host) {
+func HandleConnection(client net.Conn, servers []*Host, loadingStrategy string) {
 	log.Println("===================Handling Requests=================")
 	defer func() {
 
 		log.Println("✅ connection closed cleanly")
 		client.Close()
 	}()
-	server := NextServer(servers)
+	var server *Host
+	if loadingStrategy == "least_connection" {
+		log.Println("Using Least Connection Strategy")
+		server = LeastConnections(servers)
+	}else {
+		log.Println("Using Round Robin Strategy")
+		server = NextServer(servers)
+		// log.Println("Using Default Strategy")
+	}
 	if server == nil {
 		log.Println("No Healthy server")
 		return
@@ -78,7 +106,7 @@ func HandleConnection(client net.Conn, servers []*Host) {
 	if serverDial == nil {
 		fmt.Println("hell", err)
 	}
-	log.Println("goroutine handle", serverDial.RemoteAddr())
+	// log.Println("goroutine handle", serverDial.RemoteAddr())
 	if err != nil {
 		// panic(err)
 		log.Println("Error in Connection", err)

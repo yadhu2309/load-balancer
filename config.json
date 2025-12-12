@@ -1,5 +1,6 @@
 { 
     "tcp": {
+        "loading_strategy": "round_robin",
 
         "pools": [
             {
@@ -20,8 +21,8 @@
 
 
  "rate_limit": {
-            "capacity": 5,
-            "refill_rate_per_sec": 120
+            "capacity": 1,
+            "refill_rate_per_sec": 125
         },
         
         "healthcheck_interval": 10

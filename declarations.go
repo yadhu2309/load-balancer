@@ -13,6 +13,7 @@ var (
 type Host struct {
 	Address   string `json:"address"`
 	IsHealthy *bool  `json:"is_healthy"`
+	ActiveCon int    
 	mu        sync.RWMutex
 }
 
@@ -35,6 +36,7 @@ type PoolConfig struct {
 	HealthCheckInterval int        `json:"healthcheck_interval"`
 	IsMultiplePool      bool       `json:"is_multiple_pool"`
 	RateLimit           *RateLimit `json:"rate_limit"`
+	LoadingStrategy    string     `json:"loading_strategy"`
 }
 
 type RateLimit struct {

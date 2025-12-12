@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-func TCPLoadBalancer(pools []*Pool, rateLimitConfig *RateLimit) {
+func TCPLoadBalancer(pools []*Pool, rateLimitConfig *RateLimit, loadingStrategy string) {
 
 	var wg sync.WaitGroup
 
@@ -62,7 +62,7 @@ func TCPLoadBalancer(pools []*Pool, rateLimitConfig *RateLimit) {
 
 			servers := pools[0].Hosts
 
-			HandleConnection(conn, servers)
+			HandleConnection(conn, servers, loadingStrategy)
 
 		}(conn)
 
